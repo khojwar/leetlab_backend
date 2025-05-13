@@ -37,7 +37,9 @@ model User {
   updatedAt DateTime @updatedAt
 
   // reverse relation
-  problems Problem[] // single User can have many Problem entries
+  problems      Problem[] // single User can have many Problem entries
+  submissions   Submission[] // single User can have many Submission entries
+  problemSolved ProblemSolved[] // single User can have many ProblemSolved entries
 }
 
 model Problem {
@@ -60,5 +62,71 @@ model Problem {
   updatedAt DateTime @updatedAt
 
   // relationship
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  submissions Submission[]
+  solvedBy    ProblemSolved[]
+}
+
+// it is for storing overall test case results
+// for each submission, there can be multiple test cases
+model Submission {
+  id            String @id @default(uuid())
+  problemId     String
+  userId        String
+  sourceCode    Json
+  language      String
+  stdin         String
+  stdout        String
+  stderr        String
+  compileOutput String
+  status        String // Accepted, Wrong Answer, Time Limit Exceeded, Runtime Error, Compilation Error
+  memory        String
+  time          String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // relationship
+  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  testcases TestCaseResult[]
+}
+
+// it is for storing the result of each test case (eg. test case 1, test case 2, etc)
+model TestCaseResult {
+  id            String  @id @default(uuid())
+  submissionId  String
+  testCase      Int
+  passed        Boolean
+  stdout        String?
+  expected      String
+  stderr        String?
+  compileOutput String?
+  status        String
+  memory        String
+  time          String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // relationship
+  submission Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@index([submissionId])
+}
+
+model ProblemSolved {
+  id        String @id @default(uuid())
+  userId    String
+  problemId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // relationship
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, problemId])
 }
