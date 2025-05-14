@@ -32,7 +32,7 @@ model User {
   email    String  @unique
   image    String?
   role     UserRole @default(USER)
-  password String?
+  password String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -71,27 +71,26 @@ model Problem {
 // it is for storing overall test case results
 // for each submission, there can be multiple test cases
 model Submission {
-  id            String @id @default(uuid())
-  problemId     String
+  id            String  @id @default(uuid())
   userId        String
+  problemId     String
   sourceCode    Json
   language      String
-  stdin         String
-  stdout        String
-  stderr        String
-  compileOutput String
-  status        String // Accepted, Wrong Answer, Time Limit Exceeded, Runtime Error, Compilation Error
-  memory        String
-  time          String
+  stdin         String?
+  stdout        String?
+  stderr        String?
+  compileOutput String?
+  status        String // Accepted , wrong answer
+  memory        String?
+  time          String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // relationship
-  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
 
-  testcases TestCaseResult[]
+  testCases TestCaseResult[]
 }
 
 // it is for storing the result of each test case (eg. test case 1, test case 2, etc)
@@ -105,8 +104,8 @@ model TestCaseResult {
   stderr        String?
   compileOutput String?
   status        String
-  memory        String
-  time          String
+  memory        String?
+  time          String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

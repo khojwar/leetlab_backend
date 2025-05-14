@@ -151,8 +151,8 @@ exports.Prisma.ProblemScalarFieldEnum = {
 
 exports.Prisma.SubmissionScalarFieldEnum = {
   id: 'id',
-  problemId: 'problemId',
   userId: 'userId',
+  problemId: 'problemId',
   sourceCode: 'sourceCode',
   language: 'language',
   stdin: 'stdin',
