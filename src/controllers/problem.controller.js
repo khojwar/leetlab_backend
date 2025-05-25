@@ -95,7 +95,15 @@ export const createProblem = async (req, res) => {
 
 export const getAllProblems = async (req, res) => {
     try {
-        const problems = await db.problem.findMany();
+        const problems = await db.problem.findMany({
+            include: {
+                solvedBy: {
+                    where: {
+                        userId: req.user.id
+                    }
+                }
+            }
+        });
         
 
         if (!problems) {
@@ -265,7 +273,33 @@ export const deleteProblemById = async (req, res) => {
     }
 }
 
-// TODO: complete the function
 export const getAllProblemsSolvedByUser = async (req, res) => {
-    
+    try {
+        // get solved problems from currently logged in user 
+
+        const problems = await db.problem.findMany({
+            where: {
+                solvedBy: {
+                    some: {
+                        id: req.user.id
+                    },
+                }
+            },
+            include: {      // it gives the details of the user who solved the problem. otherwise it will only give the user id
+                solvedBy: {
+                    userId: req.user.id
+                }
+            }
+        });
+
+        res.status(200).json({
+            success: true,
+            message: "Problems fetched successfully",
+            problems
+        });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ error: "Error while fetching problems solved by user" }); 
+    }
 }
